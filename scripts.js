@@ -1,96 +1,127 @@
 document.addEventListener('DOMContentLoaded', function () {
-    const appContainer = document.getElementById("app")
+  const appContainer = document.getElementById("app");
 
-    function createTitle() {
-        const title = document.createElement('h2')
-        title.classList.add('app-title')
-        title.textContent = "Мой список задач"
-        return title
-    }
-    function createAppForm() {
-        const form = document.createElement('form')
-        const input = document.createElement('input')
-        const button = document.createElement('button')
+  // Создание заголовка
+  function createTitle() {
+    const title = document.createElement('h2');
+    title.classList.add('title');
+    title.textContent = "Мой список задач";
+    return title;
+  }
 
-        input.classList.add('app-input')
-        button.classList.add('app_btn', 'btn')
-        form.classList.add('form')
+  // Создание формы
+  function createAppForm() {
+    const form = document.createElement('form');
+    const input = document.createElement('input');
+    const button = document.createElement('button');
 
-        input.placeholder = "Введите задачу..."
-        input.id = "task-input"
-        input.type = "text"
-        button.textContent = "Добавить"
+    input.classList.add('input');
+    button.classList.add('btn_prime', 'btn');
+    form.classList.add('form');
 
-        form.append(input, button)
+    input.placeholder = "Введите задачу...";
+    input.id = "task-input";
+    input.type = "text";
+    button.textContent = "Добавить";
 
-        return{
-            form,
-            input,
-            button,
-        }
-    }
+    form.append(input, button);
+    return { form, input, button };
+  }
 
-    function creatTasksList() {
-        let list = document.createElement('ul')
+  // Создание списка задач
+  function creatList() {
+    const list = document.createElement('ul');
+    list.classList.add('list');
+    return list;
+  }
 
-        list.classList.add('list')
+  // Создание элемента задачи
+  function creatListItem(taskText) {
+    const listItem = document.createElement('li');
+    const itemText = document.createElement('p');
+    const buttonGroup = document.createElement('div');
+    const doneBtn = document.createElement('button');
+    const deleteBtn = document.createElement('button');
 
-        return list
-    }
-    function creatListItem(taskText) {
-        const listItem = document.createElement('li')
-        const itemBox = document.createElement('div')
-        const itemText = document.createElement('p')
-        const buttonGroup = document.createElement('div')
-        const doneBtn = document.createElement('button')
-        const deleteBtn = document.createElement('button')
+    listItem.classList.add('list__item');
+    itemText.classList.add('list__text');
+    buttonGroup.classList.add('buttons');
+    doneBtn.classList.add('btn', 'btn_done');
+    deleteBtn.classList.add('btn', 'btn_delete');
 
-        listItem.classList.add('list__item')
-        itemBox.classList.add('item-box')
-        itemText.classList.add('taskText')
-        buttonGroup.classList.add('button__group')
-        doneBtn.classList.add('btn', 'btn_done')
-        deleteBtn.classList.add('btn', 'btn_delete')
+    buttonGroup.append(doneBtn, deleteBtn);
+    listItem.append(itemText, buttonGroup);
 
-        buttonGroup.append(doneBtn, deleteBtn)
-        itemBox.append(itemText, buttonGroup)
-        listItem.append(itemBox)
-        itemText.textContent = taskText
-        doneBtn.textContent = 'Готово'
-        deleteBtn.textContent = 'Удалить'
+    itemText.textContent = taskText;
+    doneBtn.textContent = 'Готово';
+    deleteBtn.textContent = 'Удалить';
 
-        doneBtn.addEventListener('click', ()=>{
-            listItem.classList.toggle('completed')
-        })
-        deleteBtn.addEventListener('click', () => {
-            listItem.remove()
-        })
+    doneBtn.addEventListener('click', () => {
+      listItem.classList.toggle('completed');
+      saveList(); // Сохраняем задачи
+    });
 
-        return listItem
-    }
+    deleteBtn.addEventListener('click', () => {
+      listItem.remove();
+      saveList(); // Сохраняем задачи
+    });
 
-    function capitalize(text) {
-        if(!text) return ""
-        return text.charAt(0).toUpperCase() + text.slice(1)
-    }
+    return listItem;
+  }
 
-    function createApp() {
-        const appTitle = createTitle()
-        const appForm = createAppForm()
-        const tasksList = creatTasksList()
-        appContainer.append(appTitle, appForm.form, tasksList)
+  // Функция для преобразования текста с заглавной буквы
+  function capitalize(text) {
+    if (!text) return "";
+    return text.charAt(0).toUpperCase() + text.slice(1);
+  }
 
-        appForm.form.addEventListener('submit', (e) => {
-            e.preventDefault()
-            const taskText = capitalize(appForm.input.value.trim())
-            const listItem = creatListItem(taskText)
-            if(!taskText) return;
+  // Сохранение задач в localStorage
+  function saveList() {
+    const list = [];
+    document.querySelectorAll('.list__item').forEach(item => {
+      const itemText = item.querySelector('.list__text').textContent; // Исправлено
+      const isCompleted = item.classList.contains('completed');
+      list.push({ text: itemText, completed: isCompleted });
+    });
+    localStorage.setItem('list', JSON.stringify(list)); // Исправлено
+  }
 
-            tasksList.appendChild(listItem)
+  // Загрузка задач из localStorage
+  function loadList(list) {
+    const savedList = JSON.parse(localStorage.getItem('list'));
+    savedList.forEach(item => {
+      const listItem = creatListItem(item.text);
+      if (item.completed) {
+        listItem.classList.add('completed');
+      }
+      list.appendChild(listItem);
+    });
+  }
 
-            appForm.input.value = ""
-        })
-    }
+  // Создание приложения
+  function createApp() {
+    const appTitle = createTitle();
+    const appForm = createAppForm();
+    const tasksList = creatList();
 
-    createApp()
-})
+    appContainer.append(appTitle, appForm.form, tasksList);
+    loadList(tasksList); // Загружаем задачи
+
+    // Обработчик отправки формы
+    appForm.form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const taskText = capitalize(appForm.input.value.trim());
+      if (!taskText) {
+        alert("Введите название задачи!");
+        return;
+      }
+
+      const listItem = creatListItem(taskText);
+      tasksList.appendChild(listItem);
+      appForm.input.value = "";
+      saveList(); // Сохраняем задачи
+    });
+  }
+
+  createApp();
+});

@@ -1,0 +1,67 @@
+.container {
+ margin: 0 auto;
+ max-width: 960px;
+}
+
+#app{
+ font-size: 25px;
+}
+
+.form {
+ display: flex;
+ justify-content: space-between;
+ align-items: center;
+ margin-bottom: 15px;
+}
+
+.input{
+ display: block;
+ flex-grow: 1;
+ flex-shrink: 1;
+ padding: 4px 8px;
+ font-size: 25px;
+}
+
+.list {
+ list-style: none;
+ padding: 0;
+ margin: 0;;
+ &__item{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 5px;
+  &.completed {
+   background-color: rgb(10, 193, 10);
+  
+  }
+ }
+ &__text{
+  margin: 0;
+  padding: 4px 8px;
+ }
+}
+
+.buttons {
+ display: flex;
+ align-items: center;
+ justify-content: space-between;
+ gap: 4px;
+}
+
+.btn {
+ padding: 4px 8px;
+ color: #fff;
+ font-size: 25px;
+ &_done{
+  background-color: rgb(10, 193, 10);
+ }
+ &_delete {
+  background-color: rgb(172, 2, 28);
+ }
+ &_prime {
+  background-color: rgb(18, 162, 219);
+
+ }
+}
+
